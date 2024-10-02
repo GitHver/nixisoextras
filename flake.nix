@@ -14,12 +14,12 @@
   inputs = {
     #====<< Core Nixpkgs >>====================================================>
     nixpkgs.url    = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-st.url = "github:nixos/nixpkgs/nixos-24.05";
+    # nixpkgs-st.url = "github:nixos/nixpkgs/nixos-24.05";
     #====<< Extension utils >>=================================================>
-    disko.url = "github:nix-community/disko";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-cosmic.url = "github:lilyinstarlight/nixos-cosmic";
-    nixos-cosmic.inputs.nixpkgs.follows = "nixpkgs";
+    # disko.url = "github:nix-community/disko";
+    # disko.inputs.nixpkgs.follows = "nixpkgs";
+    # nixos-cosmic.url = "github:lilyinstarlight/nixos-cosmic";
+    # nixos-cosmic.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   #====<< Outputs Field >>=====================================================>
