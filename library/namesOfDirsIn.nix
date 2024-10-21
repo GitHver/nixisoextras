@@ -1,4 +1,5 @@
-{ lib }:
+{ lib
+}:
 
 let
   inherit (builtins) attrNames readDir;

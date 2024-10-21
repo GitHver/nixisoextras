@@ -1,5 +1,5 @@
-{ lib }:
-
+{ lib
+}:
 let
   inherit (lib) nameValuePair listToAttrs;
   inherit (lib.lists) forEach;
@@ -32,5 +32,4 @@ let
       post-quantum cryptography world. */
     })
   );
-
 in makeUsers
