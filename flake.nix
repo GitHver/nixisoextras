@@ -13,7 +13,7 @@
 
   inputs = {
     #====<< Core Nixpkgs >>====================================================>
-    nixpkgs.url    = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
   #====<< Outputs Field >>=====================================================>
@@ -50,26 +50,6 @@
       alejandra         # The uncompromising Nix code formatter
     ));
 
-    #====<< Nix Development Shells >>==========================================>
-    /* Development shells `nix develop` are ephemeral environments where you
-    can get access to packages that are only available in the initialized shell
-    (like `nix shell`), but here you can go through execution stages manually to
-    better test and verify packages. Packages from dev shells are also cached
-    after initialization so that later calls are instant. */
-    devShells = genForAllSystems (system: let
-      pkgs = import nixpkgs { inherit system; }; 
-    in {
-      "helloShell" = import ./shells/helloShell.nix { inherit pkgs; };
-      # "other" = import ./shells/otherShell.nix { inherit pkgs; };
-    });
-
-    #====<< Overlays >>========================================================>
-    /* Overlays are perhaps the most powerful feature Nix has. You can use them
-    to overlay overrides to existing packages in the with custom options. This
-    alloes you to apply your own patches or build flags with out needing to
-    maintain a fork of nixpkgs or adding a third party repository. */
-    # overlays = import ./overlays;
-
     #====<< Nix Expression Library >>==========================================>
     /* When programming in any language, you will want to avoid writing
     repetitive lines and definitions. Here you can define your own custom Nix
@@ -84,14 +64,37 @@
       default = { imports = listFilesRecursive ./modules; };
     };
 
+    #====<< Overlays >>========================================================>
+    /* Overlays are perhaps the most powerful feature Nix has. You can use them
+    to overlay overrides to existing packages in the with custom options. This
+    alloes you to apply your own patches or build flags with out needing to
+    maintain a fork of nixpkgs or adding a third party repository. */
+    # overlays = import ./overlays;
+
+    #====<< Nix Development Shells >>==========================================>
+    /* Development shells `nix develop` are ephemeral environments where you
+    can get access to packages that are only available in the initialized shell
+    (like `nix shell`), but here you can go through execution stages manually to
+    better test and verify packages. Packages from dev shells are also cached
+    after initialization so that later calls are instant. */
+    devShells = genForAllSystems (system: let
+      pkgs = import nixpkgs { inherit system; }; 
+    in {
+      "helloShell" = import ./shells/helloShell.nix { inherit pkgs; };
+      # "other" = import ./shells/otherShell.nix { inherit pkgs; };
+    });
+
     #====<< Packages >>========================================================>
     /* Here is where you define your custom packages. You can package anything
     you want, but should only keep personal packages in this repository as it
     is better to keep papackages you want to be publicaly accessable in a
     seperate repository and eventually added to the offical nixpkgs repo. */
-    # pkgs = supportedSystems (system:
-    #   import ./pkgs system
-    # );
+    pkgs = genForAllSystems (system: let
+      pkgs = import nixpkgs { inherit system; }; 
+    in {
+      "home-manager-setup" = import ./packages/home-manager-setup.nix { inherit pkgs; };
+      "upgrade-bash" = import ./packages/upgrade-bash.nix { inherit pkgs; };
+    });
 
     #====<< Applications >>====================================================>
     /* Applications differ from packages by that they can be started with:
