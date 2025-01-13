@@ -24,7 +24,7 @@
     lib = nixpkgs.lib // outputs.lib;
     #====<< Used functions >>==========>
     inherit (builtins) attrNames readDir;
-    inherit (lib) genAttrs attrsFromList;
+    inherit (lib) genAttrs attrsFromList removeSuffix;
     inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
     getFileNames = dir: (attrNames (readDir dir));
@@ -92,11 +92,9 @@
     # seperate repository and eventually added to the offical nixpkgs repo.
     pkgs = genForAllSystems (system:
     let pkgs = import nixpkgs { inherit system; }; 
-    in
-      attrsFromList (forEach (getFileNames ./packages) (package: {
-        "${package}" = import ./packages/${package}.nix { inherit pkgs; };
-      }))
-    );
+    in attrsFromList (forEach (removeSuffix ".nix" (getFileNames ./packages)) (package: {
+      "${package}" = import ./packages/${package}.nix { inherit pkgs; };
+    })));
     # {
     #   "home-manager-setup" = import ./packages/home-manager-setup.nix { inherit pkgs; };
     #   "upgrade-bash" = import ./packages/upgrade-bash.nix { inherit pkgs; };
