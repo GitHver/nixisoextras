@@ -69,7 +69,18 @@
     to overlay overrides to existing packages in the with custom options. This
     alloes you to apply your own patches or build flags with out needing to
     maintain a fork of nixpkgs or adding a third party repository. */
-    # overlays = import ./overlays;
+    overlays = {
+      default = (final: prev: {
+        # sputnix = inputs.nixisoextras.pkgs.${prev.system};
+        # use this variant if unfree packages are needed:
+        sputnix = import self {
+          inherit prev;
+          system = prev.system;
+          config.allowUnfree = true;
+        };
+      });
+      # other = (crop)
+    };
 
     #====<< Nix Development Shells >>==========================================>
     /* Development shells `nix develop` are ephemeral environments where you
