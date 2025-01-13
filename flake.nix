@@ -92,8 +92,8 @@
     # seperate repository and eventually added to the offical nixpkgs repo.
     pkgs = genForAllSystems (system:
     let pkgs = import nixpkgs { inherit system; }; 
-    in attrsFromList (forEach (removeSuffix ".nix" (getFileNames ./packages)) (package: {
-      "${package}" = import ./packages/${package}.nix { inherit pkgs; };
+    in attrsFromList (forEach (getFileNames ./packages) (package: {
+      "${removeSuffix ".nix" package}" = import ./packages/${package} { inherit pkgs; };
     })));
     # {
     #   "home-manager-setup" = import ./packages/home-manager-setup.nix { inherit pkgs; };
