@@ -71,7 +71,7 @@
     maintain a fork of nixpkgs or adding a third party repository. */
     overlays = {
       default = (final: prev: {
-        sputnix = inputs.nixisoextras.pkgs.${prev.system};
+        sputnix = self.pkgs.${prev.system};
         # use this variant if unfree packages are needed:
         # sputnix = import self {
         #   inherit prev;
