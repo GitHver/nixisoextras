@@ -23,8 +23,11 @@
     inherit (self) outputs;
     lib = nixpkgs.lib // outputs.lib;
     #====<< Used functions >>==========>
-    inherit (lib) genAttrs;
+    inherit (builtins) attrNames readDir;
+    inherit (lib) genAttrs attrsFromList;
+    inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
+    getFileNames = dir: (attrNames (readDir dir));
     #====<< Host information >>========>
     genForAllSystems = (funct: genAttrs supportedSystems funct);
     supportedSystems = [
@@ -67,7 +70,6 @@
       default = (final: prev: {
         sputnix = self.pkgs.${prev.system};
       });
-      # other = (crop)
     };
 
     #====<< Nix Development Shells >>==========================================>
@@ -90,10 +92,15 @@
     # seperate repository and eventually added to the offical nixpkgs repo.
     pkgs = genForAllSystems (system:
     let pkgs = import nixpkgs { inherit system; }; 
-    in {
-      "home-manager-setup" = import ./packages/home-manager-setup.nix { inherit pkgs; };
-      "upgrade-bash" = import ./packages/upgrade-bash.nix { inherit pkgs; };
-    });
+    in
+      attrsFromList (forEach (getFileNames ./packages) (package: {
+        "${package}" = import ./packages/${package}.nix { inherit pkgs; };
+      }))
+    );
+    # {
+    #   "home-manager-setup" = import ./packages/home-manager-setup.nix { inherit pkgs; };
+    #   "upgrade-bash" = import ./packages/upgrade-bash.nix { inherit pkgs; };
+    # });
 
     #====<< Applications >>====================================================>
     # Applications differ from packages by that they can be started with:
@@ -111,16 +118,5 @@
     anyName = "anything";
 
   };
-
-  # nixConfig = {
-  #   extra-substituters = [
-  #     "https://nix-community.cachix.org"
-  #     "https://cosmic.cachix.org/"
-  #   ];
-  #   extra-trusted-public-keys = [
-  #     "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-  #     "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
-  #   ];
-  # };
 
 } ################ End of Output and inital scope ##############################
