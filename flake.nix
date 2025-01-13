@@ -80,10 +80,9 @@
     # cached after initialization so that later calls are instant.
     devShells = genForAllSystems (system:
     let pkgs = import nixpkgs { inherit system; }; 
-    in {
-      "helloShell" = import ./shells/helloShell.nix { inherit pkgs; };
-      # "other" = import ./shells/otherShell.nix { inherit pkgs; };
-    });
+    in attrsFromList (forEach (getFileNames ./shells) (shell: {
+      "${removeSuffix ".nix" shell}" = import ./shells/${shell} { inherit pkgs; };
+    })));
 
     #====<< Packages >>========================================================>
     # Here is where you define your custom packages. You can package anything
@@ -95,10 +94,6 @@
     in attrsFromList (forEach (getFileNames ./packages) (package: {
       "${removeSuffix ".nix" package}" = import ./packages/${package} { inherit pkgs; };
     })));
-    # {
-    #   "home-manager-setup" = import ./packages/home-manager-setup.nix { inherit pkgs; };
-    #   "upgrade-bash" = import ./packages/upgrade-bash.nix { inherit pkgs; };
-    # });
 
     #====<< Applications >>====================================================>
     # Applications differ from packages by that they can be started with:
