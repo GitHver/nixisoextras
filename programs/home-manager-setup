@@ -16,7 +16,8 @@ function main {
         create-paths
     fi
     # Open the flake in the editor to change variables to their correct values
-    $EDITOR "$homepath"/flake.nix
+    nix shell nixpkgs#helix --command hx "$homepath"/flake.nix
+    # $EDITOR "$homepath"/flake.nix
     $EDITOR "$homepath"/hosts/"$HOSTNAME"/info.nix
     install
     check-nixetc
