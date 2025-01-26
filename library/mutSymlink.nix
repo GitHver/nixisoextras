@@ -4,7 +4,7 @@ let
   inherit (lib) removePrefix;
   # inherit (lib.lists) forEach;
   inherit (lib.filesystem) listFilesRecursive;
-  attrsForEach = import ./attrsFromList.nix { inherit lib; };
+  attrsForEach = import ./attrsForEach.nix { inherit lib; };
   removePathPrefix = first: second: removePrefix (toString first) (toString second);
 
   # This function takes a string corrisponding to where in your home directory
