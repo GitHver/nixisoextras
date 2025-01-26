@@ -5,5 +5,5 @@ let
   inherit (lib.lists) forEach;
   # attrsFromList = (list: foldl (a: b: a // b) { } list);
   attrsFromList = import ./attrsFromList.nix { inherit lib; };
-  attrsForEach = list: func: attrsFromList list func;
+  attrsForEach = list: func: attrsFromList (forEach list func);
 in attrsForEach
