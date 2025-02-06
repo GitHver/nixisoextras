@@ -10,9 +10,7 @@ main() {
     rm -rf .git
 
     userandhost
-
     partitioning
-
     localization
 
     testallation
@@ -20,12 +18,12 @@ main() {
 }
 
 userandhost() {
-    printf "Username: "
+    printf "Hostname: "
     read host_name
+    printf "Username: "
+    read user_name
     printf "Displayname: "
     read display_name
-    printf "Hostname: "
-    read user_name
 }
 
 partitioning() {
