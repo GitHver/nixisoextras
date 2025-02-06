@@ -1,0 +1,110 @@
+#! /usr/bin/env sh
+# set -eu # -o pipefail # Undefined in POSIX shell.
+
+repo="SputNix"
+
+main() {
+    # connect to wifi
+    git clone https://github.com/GitHver/nixisotemp.git ./"repo"
+    # # git clone git@github.com/GitHver/nixisotemp.git ~/"$repo"
+    cd ~/"repo"
+    rm -rf .git
+
+    userandhost
+
+    partitioning
+
+    localization
+
+    # print all settings
+    #     change anything?
+
+    installation
+    # testallation
+}
+
+userandhost() {
+    printf "Username: "
+    read host_name
+    printf "Displayname: "
+    read display_name
+    printf "Hostname: "
+    read user_name
+}
+
+partitioning() {
+    echo '*'
+    lsblk
+    echo '*'
+    # stay=true
+    # while $stay; do
+    printf "type in the name of the disk to install NixOS onto: "
+    read disktype
+    # echo "is this the correct disk?: $disktype"
+    # input-accept
+    # done
+}
+
+localization() {
+    locale -a | less -X
+    printf "Type in your language: "
+    read selected_language
+
+    echo "use another language for formatting? (time, date, messurments, currency, etc)"
+    input-accept || return
+
+    printf "Type in your language to use for formatting: "
+    read selected_formatting
+    
+    # confirm choice
+    # timedatectl list-timezones
+    # read time_zone
+}
+
+testallation() {
+    echo "doing the thing..."
+    echo "${display_name:=$user_name}" > /dev/null
+    echo "${selected_formatting:=$selected_language}" > /dev/null
+    echo "
+        hostname = $host_name,
+        username = $user_name,
+        displayame = $display_name,
+        disk to mount = $disktype,
+        language = $selected_language
+        formatting = $selected_formatting
+    " 
+    sleep 1
+    echo "done!"
+}
+
+installation() {
+    # rename host
+    mv ./hosts/your-hostname ./hosts/"$host_name"
+
+    # rename user
+    mv ./hosts/your-hostname/users/your-user.nix ./hosts/your-hostname/"$user_name".nix
+    sed -i "s/your_username/$user_name/" ./hosts/"$host_name"/users/"$user_name".nix
+    sed -i "s/your_displayname/${display_name:=$user_name}/" ./hosts/"$host_name"/users/"$user_name".nix
+
+    # Set the correct disktype
+    sed -i "s,/dev/disktype,/dev/$disktype,"
+
+    # change locale
+    sed -i "s/language-locale/$selected_language/"
+    sed -i "s/formatting-locale/${selected_formatting:-$selected_language}/"
+
+    # mounting the disk
+    sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ./hosts/"$host_name"/disko.nix
+
+    # Moving the repository
+    sudo nixos-generate-config --no-filesystems --root /mnt
+    sudo cp -r ~/"$repo"/. /mnt/etc/nixos
+    cd /mnt/etc/nixos
+    sudo mv ./hardware-configuration.nix ./hosts/"$host_name"
+    sudo rm ./configuration.nix
+
+    # Start the install
+    sudo nixos-install --flake .#"$host_name"
+}
+
+main "$@"
