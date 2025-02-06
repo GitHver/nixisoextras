@@ -2,7 +2,8 @@
 
 pkgs.mkShell {
   packages = (with pkgs; [
-    nix-iso-setup
+    # nix-iso-setup
+    (import ./../programs/nix-iso-setup { inherit pkgs; })
   ]);
   shellHook = /*bash*/''
     echo '

@@ -90,7 +90,7 @@
     # is better to keep papackages you want to be publicaly accessable in a
     # seperate repository and eventually added to the offical nixpkgs repo.
     pkgs = genForAllSystems (system:
-    let pkgs = (import nixpkgs { inherit system; }) // self.pkgs; 
+    let pkgs = import nixpkgs { inherit system; }; 
     in attrsFromList (forEach (getFileNames ./packages) (package: {
       "${removeSuffix ".nix" package}" = import ./packages/${package} { inherit pkgs; };
     })));
