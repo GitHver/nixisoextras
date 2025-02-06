@@ -1,7 +1,7 @@
 { pkgs }:
 
 pkgs.mkShell {
-  packages = (with pkgs.sputnix; [
+  packages = (with pkgs; [
     nix-iso-setup
   ]);
   shellHook = /*bash*/''
