@@ -15,11 +15,8 @@ main() {
 
     localization
 
-    # print all settings
-    #     change anything?
-
-    installation
     testallation
+    installation
 }
 
 userandhost() {
@@ -109,11 +106,11 @@ installation() {
     mv ./hosts/your-hostname ./hosts/"$host_name"
 
     # Set the correct disktype
-    sed -i "s,/dev/disktype,/dev/$disktype,"
+    sed -i "s,/dev/disktype,/dev/$disktype," ./host/"$host_name"/disko.nix
 
     # change locale
-    sed -i "s/language-locale/$selected_language/"
-    sed -i "s/formatting-locale/${selected_formatting:-$selected_language}/"
+    sed -i "s/language-locale/$selected_language/" ./configs/configuration.nix
+    sed -i "s/formatting-locale/${selected_formatting:-$selected_language}/" ./configs/configuration.nix
 
     # mounting the disk
     sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ./hosts/"$host_name"/disko.nix
