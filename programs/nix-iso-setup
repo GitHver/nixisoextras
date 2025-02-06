@@ -104,7 +104,7 @@ installation() {
     mv ./hosts/your-hostname ./hosts/"$host_name"
 
     # Set the correct disktype
-    sed -i "s,/dev/disktype,/dev/$disktype," ./host/"$host_name"/disko.nix
+    sed -i "s,/dev/disktype,/dev/$disktype," ./hosts/"$host_name"/disko.nix
 
     # change locale
     sed -i "s/language-locale/$selected_language/" ./configs/configuration.nix
