@@ -6,8 +6,8 @@ repo="SputNix"
 main() {
     # connect to wifi
     git clone https://github.com/GitHver/nixisotemp.git ./"$repo"
-    cd ~/"repo"
-    rm -rf .git
+    # cd ~/"$repo"
+    # rm -rf .git
 
     userandhost
     partitioning
@@ -94,6 +94,7 @@ inputAccept() {
 installation() {
 
     cd ~/$repo
+    rm -rf .git
 
     # rename user
     sed -i "s/your_username/$user_name/" ./hosts/your-hostname/users/your-user.nix
