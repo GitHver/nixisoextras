@@ -52,8 +52,8 @@ partitioning() {
         fi
         printf "\npassphrases do not match" >& 2
     done
-    # "$decrypt_passphrase" | sudo tee /tmp/decrypt_passphrase.txt
-    echo -n "$decrypt_passphrase" | sudo tee ./decrypt_passphrase.txt # POSIX undefined
+    # echo -n "$decrypt_passphrase" | sudo tee ./decrypt_passphrase.txt # POSIX undefined
+    echo -n "$decrypt_passphrase" | sudo tee /tmp/decrypt_passphrase.txt # POSIX undefined
 }
 
 localization() {
