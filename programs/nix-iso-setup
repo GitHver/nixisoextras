@@ -40,20 +40,20 @@ partitioning() {
     inputAccept || return
     encrypt=true
 
-    while true; do
-        printf "type in your decryption passphrase: "
-        read -s decrypt_passphrase # POSIX undefined
-        printf "\n         retype in your passphrase: "
-        read -s reread_decrypt_passphrase # POSIX undefined
+    # while true; do
+    #     printf "type in your decryption passphrase: "
+    #     read -s decrypt_passphrase # POSIX undefined
+    #     printf "\n         retype in your passphrase: "
+    #     read -s reread_decrypt_passphrase # POSIX undefined
 
-        if [ "$decrypt_passphrase" = "$reread_decrypt_passphrase" ]; then
-            echo "setting encryption..."
-            break
-        fi
-        printf "\npassphrases do not match" >& 2
-    done
-    # echo -n "$decrypt_passphrase" | sudo tee ./decrypt_passphrase.txt # POSIX undefined
-    echo -n "$decrypt_passphrase" | sudo tee /tmp/decrypt_passphrase.txt # POSIX undefined
+    #     if [ "$decrypt_passphrase" = "$reread_decrypt_passphrase" ]; then
+    #         echo "setting encryption..."
+    #         break
+    #     fi
+    #     printf "\npassphrases do not match" >& 2
+    # done
+    # # echo -n "$decrypt_passphrase" | sudo tee ./decrypt_passphrase.txt # POSIX undefined
+    # echo -n "$decrypt_passphrase" | sudo tee /tmp/decrypt_passphrase.txt # POSIX undefined
 }
 
 localization() {
@@ -91,13 +91,13 @@ testallation() {
 
 installation() {
 
-    cd ~/$repo
+    cd ~/"$repo"
     rm -rf .git
 
     # rename user
     sed -i "s/your_username/$user_name/" ./hosts/your-hostname/users/your-user.nix
     sed -i "s/your_displayname/${display_name:=$user_name}/" ./hosts/your-hostname/users/your-user.nix
-    mv ./hosts/your-hostname/users/your-user.nix ./hosts/your-hostname/"$user_name".nix
+    mv ./hosts/your-hostname/users/your-user.nix ./hosts/your-hostname/users/"$user_name".nix
 
     # rename host
     mv ./hosts/your-hostname ./hosts/"$host_name"
