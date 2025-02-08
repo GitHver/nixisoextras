@@ -2,5 +2,7 @@
 
 let
   inherit (lib.lists) foldl;
-  attrsFromList = (list: foldl (a: b: a // b) { } list);
-in attrsFromList
+  # attrsFromList = (list: foldl (a: b: a // b) { } list);
+# in attrsFromList
+in
+  (list: foldl (a: b: a // b) { } list)
