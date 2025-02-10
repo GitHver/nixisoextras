@@ -55,7 +55,7 @@
     # library accessable to others who reference your flake.
     # lib = import ./library { inherit lib; };
     lib = attrsForEach (getBaseFileNames ./library)
-      (fn: { ${fn} = import ./library${fn}.nix { inherit lib; }; });
+      (fn: { ${fn} = import ./library/${fn}.nix { inherit lib; }; });
 
     #====<< NixOS Modules >>===================================================>
     # This creates an attributeset where the default attribute is a list of
