@@ -3,7 +3,4 @@
 let
   inherit (builtins) attrNames readDir;
 in
-  (path:
-    readDir path
-    |> attrNames
-  )
+  (path: attrNames (readDir path))
