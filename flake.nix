@@ -24,11 +24,11 @@
     lib = nixpkgs.lib // outputs.lib;
     #====<< Used functions >>==========>
     inherit (builtins) attrNames readDir;
-    inherit (lib) genAttrs attrsFromList removeSuffix;
+    inherit (lib) genAttrs attrsFromList attrsForEach removeSuffix;
     inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
     getBaseFileNames = dir: map removeNixSuffix (attrNames (readDir dir));
-    attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
+    # attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
     removeNixSuffix = import ./library/removeNixSuffix.nix { inherit lib; };
     mapToAttrs = attrsFromList (fn: list: map fn list);
     #====<< Host information >>========>
