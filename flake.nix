@@ -21,16 +21,17 @@
     #====<< Required arguments >>======>
     # Binds the outputs attribute set to a variable
     inherit (self) outputs;
-    lib = nixpkgs.lib // outputs.lib;
+    lib = nixpkgs.lib ;# // outputs.lib;
     #====<< Used functions >>==========>
     inherit (builtins) attrNames readDir;
-    inherit (lib) genAttrs attrsFromList attrsForEach removeSuffix;
+    inherit (lib) genAttrs removeSuffix;
+    # inherit (outputs.lib) attrsFromList;
     inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
     getBaseFileNames = dir: map removeNixSuffix (attrNames (readDir dir));
-    # attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
+    attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
     removeNixSuffix = import ./library/removeNixSuffix.nix { inherit lib; };
-    mapToAttrs = attrsFromList (fn: list: map fn list);
+    # mapToAttrs = attrsFromList (fn: list: map fn list);
     #====<< Host information >>========>
     genEachArch = (funct: genAttrs supportedArchs funct);
     supportedArchs = [
@@ -86,9 +87,9 @@
     # cached after initialization so that later calls are instant.
     devShells = genEachArch (system:
     let pkgs = import nixpkgs { inherit system; }; in
-      attrsFromList (forEach (getBaseFileNames ./shells) (shell: {
+      attrsForEach (getBaseFileNames ./shells) (shell: {
         "${shell}" = import ./shells/${shell}.nix { inherit pkgs; };
-      }))
+      })
     );
 
     #====<< Packages >>========================================================>
