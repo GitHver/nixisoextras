@@ -1,3 +1,6 @@
-{ lib }:
+{ lib
+, ...
+}:
 
-(listOfFiles: map import listOfFiles)
+listOfFiles:
+  map import listOfFiles

@@ -1,4 +1,5 @@
-{ ... }:
+{ ...
+}:
 
 {
   enabled = { enable = true; };

@@ -19,19 +19,12 @@
   #====<< Outputs Field >>=====================================================>
   outputs = inputs @ { self, nixpkgs, ... }: let
     #====<< Required arguments >>======>
-    # Binds the outputs attribute set to a variable
-    inherit (self) outputs;
     lib = nixpkgs.lib ;# // outputs.lib;
     #====<< Used functions >>==========>
-    inherit (builtins) attrNames readDir;
-    inherit (lib) genAttrs removeSuffix;
-    # inherit (outputs.lib) attrsFromList;
-    inherit (lib.lists) forEach;
+    inherit (lib) genAttrs;
     inherit (lib.filesystem) listFilesRecursive;
-    getBaseFileNames = dir: map removeNixSuffix (attrNames (readDir dir));
     attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
-    removeNixSuffix = import ./library/removeNixSuffix.nix { inherit lib; };
-    # mapToAttrs = attrsFromList (fn: list: map fn list);
+    getBaseFileNames = import ./library/getBasefileNames.nix { inherit lib; };
     #====<< Host information >>========>
     genEachArch = (funct: genAttrs supportedArchs funct);
     supportedArchs = [
@@ -56,9 +49,9 @@
     # repetitive lines and definitions. Here you can define your own custom Nix
     # library accessable to others who reference your flake.
     # lib = import ./library { inherit lib; };
-    lib = attrsForEach
-      (getBaseFileNames ./library)
-      (fn: { ${fn} = import ./library/${fn}.nix { inherit lib; }; });
+    lib = attrsForEach (getBaseFileNames ./library) (fn: {
+      ${fn} = import ./library/${fn}.nix { inherit lib; };
+    });
 
     #====<< NixOS Modules >>===================================================>
     # This creates an attributeset where the default attribute is a list of
@@ -88,8 +81,10 @@
     devShells = genEachArch (system:
     let pkgs = import nixpkgs { inherit system; }; in
       attrsForEach (getBaseFileNames ./shells) (shell: {
-        "${shell}" = import ./shells/${shell}.nix { inherit pkgs; };
+        ${shell} = import ./shells/${shell}.nix { inherit pkgs; };
       })
+      # Here you can set the default package (built with `nix build`)
+      // { default = import ./shells/isoShell.nix.nix { inherit pkgs; }; }
     );
 
     #====<< Packages >>========================================================>
@@ -100,8 +95,10 @@
     pkgs = genEachArch (system:
     let pkgs = import nixpkgs { inherit system; }; in
       attrsForEach (getBaseFileNames ./packages) (package: {
-        "${package}" = import ./packages/${package}.nix { inherit pkgs; };
+        ${package} = import ./packages/${package}.nix { inherit pkgs; };
       })
+      # Here you can set the default package (built with `nix build`)
+      // { default = import ./packages/nix-iso-setup.nix { inherit pkgs; }; }
     );
 
     #====<< Applications >>====================================================>
