@@ -27,14 +27,14 @@
     inherit (lib) genAttrs attrsFromList removeSuffix;
     inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
-    getBaseFileNames = dir: removeNixSuffix (attrNames (readDir dir));
+    getBaseFileNames = dir: map removeNixSuffix (attrNames (readDir dir));
     attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
     removeNixSuffix = import ./library/removeNixSuffix.nix { inherit lib; };
     #====<< Host information >>========>
     genEachArch = (funct: genAttrs supportedArchs funct);
     supportedArchs = [
       "x86_64-linux"
-      "aarch64-linux"
+      # "aarch64-linux"
     ];
   in {
 
@@ -84,7 +84,7 @@
     # cached after initialization so that later calls are instant.
     devShells = genEachArch (system:
     let pkgs = import nixpkgs { inherit system; }; in
-      attrsFromList (forEach(getBaseFileNames ./shells) (shell: {
+      attrsFromList (forEach (getBaseFileNames ./shells) (shell: {
         "${shell}" = import ./shells/${shell}.nix { inherit pkgs; };
       }))
     );
