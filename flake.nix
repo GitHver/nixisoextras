@@ -24,7 +24,7 @@
     inherit (lib) genAttrs;
     inherit (lib.filesystem) listFilesRecursive;
     attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
-    getBaseFileNames = import ./library/getBasefileNames.nix { inherit lib; };
+    getBaseFileNames = import ./library/getBaseFileNames.nix { inherit lib; };
     #====<< Host information >>========>
     genEachArch = (funct: genAttrs supportedArchs funct);
     supportedArchs = [
@@ -48,7 +48,6 @@
     # When programming in any language, you will want to avoid writing
     # repetitive lines and definitions. Here you can define your own custom Nix
     # library accessable to others who reference your flake.
-    # lib = import ./library { inherit lib; };
     lib = attrsForEach (getBaseFileNames ./library) (fn: {
       ${fn} = import ./library/${fn}.nix { inherit lib; };
     });
@@ -83,8 +82,8 @@
       attrsForEach (getBaseFileNames ./shells) (shell: {
         ${shell} = import ./shells/${shell}.nix { inherit pkgs; };
       })
-      # Here you can set the default package (built with `nix build`)
-      // { default = import ./shells/isoShell.nix.nix { inherit pkgs; }; }
+      # Here you can set the default package (built with `nix develop`)
+      // { default = import ./shells/isoShell.nix { inherit pkgs; }; }
     );
 
     #====<< Packages >>========================================================>
