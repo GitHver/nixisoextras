@@ -21,10 +21,10 @@
     #====<< Required arguments >>======>
     # Binds the outputs attribute set to a variable
     inherit (self) outputs;
-    lib = nixpkgs.lib // outputs.lib;
+    lib = nixpkgs.lib; #// outputs.lib;
     #====<< Used functions >>==========>
     inherit (builtins) attrNames readDir;
-    inherit (lib) genAttrs attrsFromList removeSuffix;
+    inherit (outputs.lib) genAttrs attrsFromList removeSuffix;
     # inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
     getBaseFileNames = dir: removeNixSuffix (attrNames (readDir dir));
