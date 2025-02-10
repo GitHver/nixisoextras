@@ -25,7 +25,7 @@
     #====<< Used functions >>==========>
     inherit (builtins) attrNames readDir;
     inherit (lib) genAttrs attrsFromList removeSuffix;
-    # inherit (lib.lists) forEach;
+    inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
     getBaseFileNames = dir: removeNixSuffix (attrNames (readDir dir));
     attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
@@ -84,9 +84,9 @@
     # cached after initialization so that later calls are instant.
     devShells = genEachArch (system:
     let pkgs = import nixpkgs { inherit system; }; in
-      attrsForEach (getBaseFileNames ./shells) (shell: {
+      attrsFromList (forEach(getBaseFileNames ./shells) (shell: {
         "${shell}" = import ./shells/${shell}.nix { inherit pkgs; };
-      })
+      }))
     );
 
     #====<< Packages >>========================================================>
@@ -96,9 +96,9 @@
     # seperate repository and eventually added to the offical nixpkgs repo.
     pkgs = genEachArch (system:
     let pkgs = import nixpkgs { inherit system; }; in
-      attrsForEach (getBaseFileNames ./packages) (package: {
+      attrsFromList (forEach (getBaseFileNames ./packages) (package: {
         "${package}" = import ./packages/${package}.nix { inherit pkgs; };
-      })
+      }))
     );
 
     #====<< Applications >>====================================================>
