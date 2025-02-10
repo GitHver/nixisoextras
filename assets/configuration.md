@@ -7,29 +7,24 @@ With your system up and running you can start to get to know your system and it'
 If use `cd /ect/nixos` or `zn` you will go into the directory containing the configuration you modified during the installation. To see the directory in a tree view you can use `eza -lt`, where you can add `-s type` to the end to sort directories first.  From here you can open `yazi` and look around the directory.
 
 ```
-.
+/home/USER/Nix/nixos-config
 ├── assets
-│  ├── loginscreen-light.jpg
-│  └── loginscreen.jpg
-├── hardware
-│  ├── !template
+│  ├── docs1.md
+│  ├── docs2.md
+│  └── ...
+├── hosts
+│  ├── your-host
 │  │  ├── users
 │  │  │  └── user.nix
-│  │  ├── disko.nix
-│  │  ├── hardware.nix
-│  │  └── users.nix
-│  ├── a4h2o
-│  │  ├── users
-│  │  │  └── user.nix
+│  │  ├── default.nix
 │  │  ├── disko.nix
 │  │  ├── hardware-configuration.nix
-│  │  ├── hardware.nix
 │  │  └── users.nix
-│  ├── ISO-image.nix
-│  └── configuration.nix
-├── library
-│  ├── makeusers.nix
-│  └── recursiveMerge.nix
+│  └── ...
+├── configs
+│  ├── shared-all.nix
+│  ├── shared-some.nix
+│  └── ...
 ├── modules
 │  ├── hardware
 │  │  ├── amdgpu.nix
@@ -37,10 +32,10 @@ If use `cd /ect/nixos` or `zn` you will go into the directory containing the con
 │  │  └── virtualization.nix
 │  ├── module1.nix
 │  ├── module2.nix
-│  └── module3.nix
+│  └── ...
 ├── flake.lock
 ├── flake.nix
-├── license.txt
+├── license.md
 └── readme.md
 ```
 

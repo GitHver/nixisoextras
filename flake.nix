@@ -25,12 +25,14 @@
     #====<< Used functions >>==========>
     inherit (builtins) attrNames readDir;
     inherit (lib) genAttrs attrsFromList removeSuffix;
-    inherit (lib.lists) forEach;
+    # inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
-    getFileNames = dir: (attrNames (readDir dir));
+    getBaseFileNames = dir: removeNixSuffix (attrNames (readDir dir));
+    attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
+    removeNixSuffix = import ./library/removeNixSuffix.nix { inherit lib; };
     #====<< Host information >>========>
-    genForAllSystems = (funct: genAttrs supportedSystems funct);
-    supportedSystems = [
+    genEachArch = (funct: genAttrs supportedArchs funct);
+    supportedArchs = [
       "x86_64-linux"
       "aarch64-linux"
     ];
@@ -40,7 +42,7 @@
     # This defines the formatter that is used when you run `nix fmt`. Since this
     # calls the formatters package, you'll need to define which architecture
     # package is used so different computers can fetch the right package.
-    formatter = genForAllSystems (system:
+    formatter = genEachArch (system:
       let pkgs = import nixpkgs { inherit system; };
       in pkgs.nixpkgs-fmt
       or pkgs.nixfmt-rfc-style
@@ -51,7 +53,8 @@
     # When programming in any language, you will want to avoid writing
     # repetitive lines and definitions. Here you can define your own custom Nix
     # library accessable to others who reference your flake.
-    lib = import ./library { inherit lib; };
+    # lib = import ./library { inherit lib; };
+    lib = map (fn: import fn { inherit lib; }) (listFilesRecursive ./library);
 
     #====<< NixOS Modules >>===================================================>
     # This creates an attributeset where the default attribute is a list of
@@ -78,22 +81,24 @@
     # (like `nix shell`), but here you can go through execution stages manually
     # to better test and verify packages. Packages from dev shells are also
     # cached after initialization so that later calls are instant.
-    devShells = genForAllSystems (system:
-    let pkgs = import nixpkgs { inherit system; }; 
-    in attrsFromList (forEach (getFileNames ./shells) (shell: {
-      "${removeSuffix ".nix" shell}" = import ./shells/${shell} { inherit pkgs; };
-    })));
+    devShells = genEachArch (system:
+    let pkgs = import nixpkgs { inherit system; }; in
+      attrsForEach (getBaseFileNames ./shells) (shell: {
+        "${shell}" = import ./shells/${shell}.nix { inherit pkgs; };
+      })
+    );
 
     #====<< Packages >>========================================================>
     # Here is where you define your custom packages. You can package anything
     # you want, but should only keep personal packages in this repository as it
     # is better to keep papackages you want to be publicaly accessable in a
     # seperate repository and eventually added to the offical nixpkgs repo.
-    pkgs = genForAllSystems (system:
-    let pkgs = import nixpkgs { inherit system; }; 
-    in attrsFromList (forEach (getFileNames ./packages) (package: {
-      "${removeSuffix ".nix" package}" = import ./packages/${package} { inherit pkgs; };
-    })));
+    pkgs = genEachArch (system:
+    let pkgs = import nixpkgs { inherit system; }; in
+      attrsForEach (getBaseFileNames ./packages) (package: {
+        "${package}" = import ./packages/${package}.nix { inherit pkgs; };
+      })
+    );
 
     #====<< Applications >>====================================================>
     # Applications differ from packages by that they can be started with:
