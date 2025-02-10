@@ -30,6 +30,7 @@
     getBaseFileNames = dir: map removeNixSuffix (attrNames (readDir dir));
     attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
     removeNixSuffix = import ./library/removeNixSuffix.nix { inherit lib; };
+    mapToAttrs = attrsFromList (fn: list: map fn list);
     #====<< Host information >>========>
     genEachArch = (funct: genAttrs supportedArchs funct);
     supportedArchs = [
@@ -96,9 +97,9 @@
     # seperate repository and eventually added to the offical nixpkgs repo.
     pkgs = genEachArch (system:
     let pkgs = import nixpkgs { inherit system; }; in
-      attrsFromList (forEach (getBaseFileNames ./packages) (package: {
+      attrsForEach (getBaseFileNames ./packages) (package: {
         "${package}" = import ./packages/${package}.nix { inherit pkgs; };
-      }))
+      })
     );
 
     #====<< Applications >>====================================================>
