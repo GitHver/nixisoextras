@@ -24,7 +24,7 @@
     lib = nixpkgs.lib // outputs.lib;
     #====<< Used functions >>==========>
     inherit (builtins) attrNames readDir;
-    inherit (outputs.lib) genAttrs attrsFromList removeSuffix;
+    inherit (lib) genAttrs attrsFromList removeSuffix;
     # inherit (lib.lists) forEach;
     inherit (lib.filesystem) listFilesRecursive;
     getBaseFileNames = dir: removeNixSuffix (attrNames (readDir dir));
