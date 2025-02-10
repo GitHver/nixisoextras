@@ -21,7 +21,7 @@
     #====<< Required arguments >>======>
     # Binds the outputs attribute set to a variable
     inherit (self) outputs;
-    lib = nixpkgs.lib; #// outputs.lib;
+    lib = nixpkgs.lib // outputs.lib;
     #====<< Used functions >>==========>
     inherit (builtins) attrNames readDir;
     inherit (outputs.lib) genAttrs attrsFromList removeSuffix;
@@ -53,9 +53,9 @@
     # When programming in any language, you will want to avoid writing
     # repetitive lines and definitions. Here you can define your own custom Nix
     # library accessable to others who reference your flake.
-    # lib = import ./library { inherit lib; };
-    lib = attrsForEach (getBaseFileNames ./library)
-      (fn: { ${fn} = import ./library/${fn}.nix { inherit lib; }; });
+    lib = import ./library { inherit lib; };
+    # lib = attrsForEach (getBaseFileNames ./library)
+    #   (fn: { ${fn} = import ./library/${fn}.nix { inherit lib; }; });
 
     #====<< NixOS Modules >>===================================================>
     # This creates an attributeset where the default attribute is a list of
