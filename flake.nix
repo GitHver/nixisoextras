@@ -29,7 +29,7 @@
     genEachArch = (funct: genAttrs supportedArchs funct);
     supportedArchs = [
       "x86_64-linux"
-      # "aarch64-linux"
+      "aarch64-linux"
     ];
   in {
 
