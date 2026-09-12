@@ -2,13 +2,7 @@
 
   # Replace this with a description of what your flake does
   description = ''
-    # The SputNix flake!
-
-    The Purpose this flake is to be a starting template for beginners to use
-    in order to get familiar with the Nix ecosystem. It is not a complete
-    framework for using your system like a distribution, but is designed in
-    a way for you to be easily able to modify by taking a fairly unopinionated
-    stance on structuring.
+    # The SputNix Extras flake!
   '';
 
   inputs = {
@@ -26,10 +20,14 @@
     attrsForEach = import ./library/attrsForEach.nix { inherit lib; };
     getBaseFileNames = import ./library/getBaseFileNames.nix { inherit lib; };
     #====<< Host information >>========>
+    # This is only for the formatter, as it is not tied to an active system.
     genEachArch = (funct: genAttrs supportedArchs funct);
     supportedArchs = [
       "x86_64-linux"
+      "x86_64-darwin"
+      "i686-linux"
       "aarch64-linux"
+      "aarch64-darwin"
     ];
   in {
 
@@ -38,7 +36,7 @@
     # calls the formatters package, you'll need to define which architecture
     # package is used so different computers can fetch the right package.
     formatter = genEachArch (system:
-      let pkgs = import nixpkgs { inherit system; };
+      let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; };
       in pkgs.nixpkgs-fmt
       or pkgs.nixfmt-rfc-style
       or pkgs.alejandra
@@ -65,11 +63,11 @@
     # to overlay overrides to existing packages in the with custom options. This
     # alloes you to apply your own patches or build flags with out needing to
     # maintain a fork of nixpkgs or adding a third party repository.
-    overlays = {
-      default = (final: prev: {
-        sputnix = self.pkgs.${prev.system};
-      });
-    };
+    # overlays = {
+    #   default = (final: prev: {
+    #     sputnix = self.pkgs.${prev.system};
+    #   });
+    # };
 
     #====<< Nix Development Shells >>==========================================>
     # Development shells `nix develop` are ephemeral environments where you can
@@ -78,12 +76,12 @@
     # to better test and verify packages. Packages from dev shells are also
     # cached after initialization so that later calls are instant.
     devShells = genEachArch (system:
-    let pkgs = import nixpkgs { inherit system; }; in
+    let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; }; in
       attrsForEach (getBaseFileNames ./shells) (shell: {
         ${shell} = import ./shells/${shell}.nix { inherit pkgs; };
       })
-      # Here you can set the default package (built with `nix develop`)
-      // { default = import ./shells/isoShell.nix { inherit pkgs; }; }
+      # # Here you can set the default package (built with `nix develop`)
+      # // { default = import ./shells/isoShell.nix { inherit pkgs; }; }
     );
 
     #====<< Packages >>========================================================>
@@ -91,22 +89,32 @@
     # you want, but should only keep personal packages in this repository as it
     # is better to keep papackages you want to be publicaly accessable in a
     # seperate repository and eventually added to the offical nixpkgs repo.
-    pkgs = genEachArch (system:
-    let pkgs = import nixpkgs { inherit system; }; in
+    packages = genEachArch (system:
+    let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; }; in
       attrsForEach (getBaseFileNames ./packages) (package: {
         ${package} = import ./packages/${package}.nix { inherit pkgs; };
       })
-      # Here you can set the default package (built with `nix build`)
-      // { default = import ./packages/nix-iso-setup.nix { inherit pkgs; }; }
+      # # Here you can set the default package (built with `nix build`)
+      # // { default = import ./packages/nix-iso-setup.nix { inherit pkgs; }; }
     );
+    # packages."x86_64-linux" = {
+    #   default = import ./packages/nix-iso-setup.nix {
+    #     pkgs = import nixpkgs { system = "x86_64-linux"; };
+    #   };
+    # };
 
     #====<< Applications >>====================================================>
     # Applications differ from packages by that they can be started with:
     # `nix run .#<name-of-application>`. As you can only "run" applications,
     # other packages like theme sets or program extensions like plugins cannot
     # be applications. Other than that they are identical.
-    # apps = supportedSystems (system:
-    #   import ./apps system
+    # apps = genEachArch (system:
+    # let pkgs = import nixpkgs { inherit system; }; in
+    #   attrsForEach (getBaseFileNames ./packages) (package: {
+    #     ${package} = import ./packages/${package}.nix { inherit pkgs; };
+    #   })
+    #   # Here you can set the default package (built with `nix build`)
+    #   // { default = import ./packages/nix-iso-setup.nix { inherit pkgs; }; }
     # );
 
     #====<< Literally Anything >>==============================================>
