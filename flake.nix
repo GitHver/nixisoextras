@@ -22,6 +22,10 @@
     #====<< Host information >>========>
     # This is only for the formatter, as it is not tied to an active system.
     genEachArch = (funct: genAttrs supportedArchs funct);
+    forAllSystems = f: builtins.listToAttrs (map (system: {
+      name = system;
+      value = f system;
+    }) supportedArchs);
     supportedArchs = [
       "x86_64-linux"
       "x86_64-darwin"
@@ -35,12 +39,12 @@
     # This defines the formatter that is used when you run `nix fmt`. Since this
     # calls the formatters package, you'll need to define which architecture
     # package is used so different computers can fetch the right package.
-    formatter = genEachArch (system:
-      let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; };
-      in pkgs.nixpkgs-fmt
-      or pkgs.nixfmt-rfc-style
-      or pkgs.alejandra
-    );
+    # formatter = genEachArch (system:
+    #   let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; };
+    #   in pkgs.nixpkgs-fmt
+    #   or pkgs.nixfmt-rfc-style
+    #   or pkgs.alejandra
+    # );
 
     #====<< Nix Expression Library >>==========================================>
     # When programming in any language, you will want to avoid writing
@@ -63,13 +67,13 @@
     # to overlay overrides to existing packages in the with custom options. This
     # alloes you to apply your own patches or build flags with out needing to
     # maintain a fork of nixpkgs or adding a third party repository.
-    # overlays = {
-    #   default = (final: prev: {
+    overlays = {
+      default = (final: prev: {
     #     # sputnix = self.pkgs.${prev.stdenv.hostPlatform.system};
-    #     sputnix = self.pkgs.${prev.stdenv.hostPlatform.system};
-    #     # sputnix = self.pkgs.${prev.system};
-    #   });
-    # };
+        # sputnix = self.pkgs.${prev.stdenv.hostPlatform.system};
+        sputnix = self.packages.${prev.system};
+      });
+    };
 
     #====<< Nix Development Shells >>==========================================>
     # Development shells `nix develop` are ephemeral environments where you can
@@ -77,28 +81,38 @@
     # (like `nix shell`), but here you can go through execution stages manually
     # to better test and verify packages. Packages from dev shells are also
     # cached after initialization so that later calls are instant.
-    devShells = genEachArch (system:
-    let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; }; in
-      attrsForEach (getBaseFileNames ./shells) (shell: {
-        ${shell} = import ./shells/${shell}.nix { inherit pkgs; };
-      })
-      # # Here you can set the default package (built with `nix develop`)
-      # // { default = import ./shells/isoShell.nix { inherit pkgs; }; }
-    );
+    # devShells = genEachArch (system:
+    # let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; }; in
+    #   attrsForEach (getBaseFileNames ./shells) (shell: {
+    #     ${shell} = import ./shells/${shell}.nix { inherit pkgs; };
+    #   })
+    #   # # Here you can set the default package (built with `nix develop`)
+    #   # // { default = import ./shells/isoShell.nix { inherit pkgs; }; }
+    # );
 
     #====<< Packages >>========================================================>
     # Here is where you define your custom packages. You can package anything
     # you want, but should only keep personal packages in this repository as it
     # is better to keep papackages you want to be publicaly accessable in a
     # seperate repository and eventually added to the offical nixpkgs repo.
-    pkgs = genEachArch (system:
-    let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; }; in
-      attrsForEach (getBaseFileNames ./packages) (package: {
-        ${package} = import ./packages/${package}.nix { inherit pkgs; };
-      })
-      # # Here you can set the default package (built with `nix build`)
-      # // { default = import ./packages/nix-iso-setup.nix { inherit pkgs; }; }
-    );
+    packages = forAllSystems (system: let
+      # pkgs = nixpkgs.legacyPackages.${system};
+      # pkgs = import nixpkgs { stdenv.hostPlatform.system = system; };
+      pkgs = import nixpkgs { inherit system; };
+    in {
+      home = pkgs.writeShellApplication {
+        name = "home-manager-setup";
+        text = ./programs/home-manager-setup;
+      };
+    });
+    # packages = genEachArch (system:
+    # let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; }; in
+    #   attrsForEach (getBaseFileNames ./packages) (package: {
+    #     ${package} = import ./packages/${package}.nix { inherit pkgs; };
+    #   })
+    #   # # Here you can set the default package (built with `nix build`)
+    #   # // { default = import ./packages/nix-iso-setup.nix { inherit pkgs; }; }
+    # );
     # packages."x86_64-linux" = {
     #   default = import ./packages/nix-iso-setup.nix {
     #     pkgs = import nixpkgs { system = "x86_64-linux"; };
