@@ -65,7 +65,8 @@
     # maintain a fork of nixpkgs or adding a third party repository.
     overlays = {
       default = (final: prev: {
-        sputnix = self.pkgs.${prev.stdenv.hostPlatform.system};
+        # sputnix = self.pkgs.${prev.stdenv.hostPlatform.system};
+        sputnix = self.pkgs.${prev.system};
       });
     };
 
