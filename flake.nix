@@ -71,7 +71,7 @@
       default = (final: prev: {
     #     # sputnix = self.pkgs.${prev.stdenv.hostPlatform.system};
         # sputnix = self.pkgs.${prev.stdenv.hostPlatform.system};
-        sputnix = self.packages.${prev.system};
+        sputnix = self.packages.${final.stdenv.hostPlatform.system};
       });
     };
 
@@ -96,9 +96,9 @@
     # is better to keep papackages you want to be publicaly accessable in a
     # seperate repository and eventually added to the offical nixpkgs repo.
     packages = forAllSystems (system: let
-      # pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = nixpkgs.legacyPackages.${system};
       # pkgs = import nixpkgs { stdenv.hostPlatform.system = system; };
-      pkgs = import nixpkgs { inherit system; };
+      # pkgs = import nixpkgs { inherit system; };
     in {
       home = pkgs.writeShellApplication {
         name = "home-manager-setup";
