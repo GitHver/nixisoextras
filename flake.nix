@@ -89,7 +89,7 @@
     # you want, but should only keep personal packages in this repository as it
     # is better to keep papackages you want to be publicaly accessable in a
     # seperate repository and eventually added to the offical nixpkgs repo.
-    packages = genEachArch (system:
+    pkgs = genEachArch (system:
     let pkgs = import nixpkgs { stdenv.hostPlatform.system = system; }; in
       attrsForEach (getBaseFileNames ./packages) (package: {
         ${package} = import ./packages/${package}.nix { inherit pkgs; };
