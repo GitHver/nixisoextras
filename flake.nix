@@ -63,11 +63,11 @@
     # to overlay overrides to existing packages in the with custom options. This
     # alloes you to apply your own patches or build flags with out needing to
     # maintain a fork of nixpkgs or adding a third party repository.
-    # overlays = {
-    #   default = (final: prev: {
-    #     sputnix = self.pkgs.${prev.system};
-    #   });
-    # };
+    overlays = {
+      default = (final: prev: {
+        sputnix = self.pkgs.stdenv.hostPlatform.${prev.system};
+      });
+    };
 
     #====<< Nix Development Shells >>==========================================>
     # Development shells `nix develop` are ephemeral environments where you can
