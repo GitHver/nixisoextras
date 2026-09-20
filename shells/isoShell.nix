@@ -7,7 +7,7 @@ pkgs.mkShell {
   ]);
   shellHook = /*bash*/''
     echo '
-        welcome to the early iteration of the Inix installer
+        welcome to the early iteration of the Inix installer.
         as of 6/2/25, this project is barely functional.
         Good luck!!
     '

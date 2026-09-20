@@ -8,24 +8,26 @@ main() {
     git clone https://github.com/GitHver/nixisotemp.git ./"$repo"
 
     # Get variables to replace in file
-    userandhost
-    partitioning
-    localization
-
-    testallation
-    installation
-}
-
-userandhost() {
+    # userandhost
     printf "Hostname: "
     read host_name
     printf "Username: "
     read user_name
     printf "Displayname: "
     read display_name
-}
 
-partitioning() {
+    # localization
+    locale -a | less -X
+    printf "Type in your language: "
+    read selected_language
+
+    echo "use another language for formatting? (time, date, messurments, currency, etc)"
+    inputAccept || return
+
+    printf "Type in your language to use for formatting: "
+    read selected_formatting
+
+    # partitioning
     echo '*'
     lsblk
     echo '*'
@@ -54,25 +56,8 @@ partitioning() {
     # done
     # # echo -n "$decrypt_passphrase" | sudo tee ./decrypt_passphrase.txt # POSIX undefined
     # echo -n "$decrypt_passphrase" | sudo tee /tmp/decrypt_passphrase.txt # POSIX undefined
-}
 
-localization() {
-    locale -a | less -X
-    printf "Type in your language: "
-    read selected_language
-
-    echo "use another language for formatting? (time, date, messurments, currency, etc)"
-    inputAccept || return
-
-    printf "Type in your language to use for formatting: "
-    read selected_formatting
-    
-    # confirm choice
-    # timedatectl list-timezones
-    # read time_zone
-}
-
-testallation() {
+    # testallation
     echo "set values..."
     echo "${display_name:=$user_name}" > /dev/null
     echo "${selected_formatting:=$selected_language}" > /dev/null
@@ -87,10 +72,8 @@ testallation() {
     " 
     sleep 5
     echo "done!"
-}
 
-installation() {
-
+    # installation
     cd ~/"$repo"
     rm -rf .git
 
@@ -124,6 +107,7 @@ installation() {
 
     # Start the install
     sudo nixos-install --flake .#"$host_name"
+
 }
 
 # This function can be called to take input from the user on whether to proceed.
